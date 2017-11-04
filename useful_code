@@ -1,0 +1,9 @@
+| IF bexpr LBRACE cmd RBRACE
+        | FOR bexpr LBRACE cmd RBRACE 
+
+        VAR ATTRIB expr ENDLINE{ $$ = ast_attrib($1, $3);}
+
+
+{L_COMMENT}	{
+			printf("line comment %s, ",yytext);
+			}
