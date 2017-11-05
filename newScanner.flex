@@ -22,14 +22,18 @@ int yyline=1;
 
 	/* definitions */
 
+
+IF ^if
+ELSE ^else
+FOR ^for
+DEC ^var
+BOOLEAN true|false
 VAR [a-zA-Z][a-zA-Z0-9]*
-RESERVED if|else|for|var
 BRACES \{|\}
 DIGIT [0-9]
-BOOLEAN true|false
 OP \+|\-|\*|\/|\%|\=
 LOP \&\&|\|\|
-ROP \<|\>|\<\=|\>\=|\!\=|\=\=
+ROP \<|\>|\<\=|\>\=|\!\=|=
 L_COMMENT #.*
 NW \n
 W_SPACE [ \t]
@@ -53,36 +57,25 @@ ENDLINE ;
 			return BOOL;
 			}		
 
-{VAR}		{
-			yylval.varValue = strdup(yytext);
-			return VAR;
-			}
-
 {BRACES}	{
 			char c = yytext[0];
 			if(c=='{'){
 				return LBRACE;
 				}
-			else{
+			if(c=='}'){
 				return RBRACE;
 				}
 			}
 
-{RESERVED}	{
-			yylval.key = strdup(yytext);
-			if(strcmp(yytext,"if")==0){
-				return IF;
-				}
-			if(strcmp(yytext,"else")==0){
-				return ELSE;
-				}
-			if(strcmp(yytext,"for")==0){
-				return FOR;
-				}
-			if(strcmp(yytext,"var")==0){
-				return DECLARATION;
-				}
-			}		
+{IF}		{ return IF;}
+{ELSE}		{ return ELSE;}
+{FOR}		{ return FOR;}
+{DEC}		{ return DECLARATION;}
+
+{VAR}		{
+			yylval.varValue = strdup(yytext);
+			return VAR;
+			}
 
 {OP} 		{
 			char c = yytext[0];
@@ -115,7 +108,6 @@ ENDLINE ;
 				return EQUAL;
 				}
 			if(strcmp(yytext,"<")==0){
-				printf("LT\n");
 				return LT;
 				}
 			if(strcmp(yytext,">")==0){

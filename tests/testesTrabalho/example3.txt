@@ -1,2 +1,2 @@
 #simple attribution
-t = 4 + 3 * 2;
+t = 4 * 3 / 2 + 5;

@@ -27,17 +27,6 @@ Epilogue
   BOOL
   INT
   ATTRIB
-  PLUS
-  MINUS
-  DIVISION
-  TIMES
-  MOD
-  EQUAL
-  DIFFERENT
-  GT
-  GTE
-  LT
-  LTE
   AND
   OR
   IF
@@ -51,7 +40,7 @@ Epilogue
 // Operator associativity & precedence
 %left EQUAL DIFFERENT GT GTE LT LTE
 %left PLUS MINUS
-%left TIMES DIVISION MOD
+%left DIVISION TIMES MOD
 // Root-level grammar symbol
 %start program;
 
@@ -64,7 +53,6 @@ Epilogue
   Cmd* cmdValue;
   char* varValue;
   int varIntValue;
-  char* key;
 }
 
 %type <intValue> INT
@@ -97,11 +85,19 @@ BExpr* broot;
 %%
 program : source
 
-source  : line
+source  : line 
         | line source
         ;
 
-line    : cmd ENDLINE {cmd = $1;}
+line    : cmd {cmd = $1;}
+
+cmd     : VAR ATTRIB expr ENDLINE
+          { $$ = ast_attrib($1, $3);}
+        | IF bexpr LBRACE cmd RBRACE 
+          { $$ = ast_if($2,$4);}
+        | FOR bexpr LBRACE cmd RBRACE 
+          { $$ = ast_for($2,$4);}
+        ;
 
 expr    :
         INT { 
@@ -141,10 +137,6 @@ expr    :
         }
         ;
 
-cmd     : 
-        VAR ATTRIB expr { $$ = ast_attrib($1, $3);}
-        ;
-
 bexpr   :
         BOOL{
           $$ = ast_boolean($1);
@@ -166,12 +158,12 @@ bexpr   :
             $$ = ast_roperation(GTE, $1, $3);
         }
         | 
-        expr EQUAL expr{
-            $$ = ast_roperation(EQUAL, $1, $3);
+        bexpr EQUAL bexpr{
+            $$ = ast_rBoperation(EQUAL, $1, $3);
         }
         | 
-        expr DIFFERENT expr{
-            $$ = ast_roperation(DIFFERENT, $1, $3);
+        bexpr DIFFERENT bexpr{
+            $$ = ast_rBoperation(DIFFERENT, $1, $3);
         }
         ;
 

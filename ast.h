@@ -27,7 +27,8 @@ struct _Expr {
 struct _BExpr{
   enum{
     E_BOOL,
-    E_ROPERATION
+    E_ROPERATION,
+    E_RBOPERATION
   } kind;
   union{
    int value;
@@ -35,7 +36,12 @@ struct _BExpr{
        int operator; //logical and relational
        struct _Expr* left;
        struct _Expr* right;
-      } op;
+      }op;
+    struct {
+       int operator; //logical and relational
+       struct _BExpr* left;
+       struct _BExpr* right;
+      }bop;
     } attr;
   };
 
@@ -44,7 +50,8 @@ struct _Cmd{
   enum {
     E_ATTRIB,
     E_FOR,
-    E_IF
+    E_IF,
+    E_IFELSE
   }kind;
     union {
       struct{
@@ -59,7 +66,10 @@ struct _Cmd{
       }ifelse;
       struct{
         struct _BExpr* condition;
-        //char *keyword;
+        struct _Cmd* cmd;
+      }forcmd;
+      struct{
+        struct _BExpr* condition;
         struct _Cmd* cmd;
       }ifcmd; // for binary expressions// for string values used in variables
   } attr;
@@ -73,9 +83,13 @@ typedef struct _Cmd Cmd;
 // Constructor functions (see implementation in ast.c)
 Expr* ast_integer(int v);
 BExpr* ast_boolean(int v);
+BExpr* ast_roperation(int operator,Expr* left,Expr* right);
+BExpr* ast_rBoperation(int operator,BExpr* left,BExpr* right);
 Expr* ast_operation(int operator, Expr* left, Expr* right);
 Expr* ast_var(char* i);
 Cmd* ast_attrib(char* variable,Expr* rightSide);
-BExpr* ast_roperation(int operator,Expr* left,Expr* right);
+Cmd* ast_if(BExpr* condition,Cmd* commands);
+Cmd* ast_ifelse(BExpr* condition,Cmd* commandIf,Cmd* commandElse);
+Cmd* ast_for(BExpr* condition,Cmd* commands);
 
 #endif

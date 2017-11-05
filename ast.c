@@ -15,6 +15,31 @@ Cmd* ast_attrib(char *c,Expr* right){
   return node;
 }
 
+Cmd* ast_if(BExpr* condition,Cmd* commands){
+  Cmd* node = (Cmd*) malloc(sizeof(Cmd));
+  node->kind = E_IF;
+  node->attr.ifcmd.condition = condition;
+  node->attr.ifcmd.cmd = commands;
+  return node;
+}
+
+Cmd* ast_ifelse(BExpr* condition,Cmd* commandIf,Cmd* commandElse){
+  Cmd* node = (Cmd*) malloc(sizeof(Cmd));
+  node->kind = E_IFELSE;
+  node->attr.ifelse.condition = condition;
+  node->attr.ifelse.cmdleft = commandIf;
+  node->attr.ifelse.cmdright = commandElse;
+  return node;
+}
+
+Cmd* ast_for(BExpr* condition,Cmd* commands){
+  Cmd* node = (Cmd*) malloc(sizeof(Cmd));
+  node->kind = E_FOR;
+  node->attr.forcmd.condition = condition;
+  node->attr.forcmd.cmd = commands;
+  return node;
+}
+
 Expr* ast_integer(int v) {
   Expr* node = (Expr*) malloc(sizeof(Expr));
   node->kind = E_INTEGER;
@@ -30,13 +55,6 @@ BExpr* ast_boolean(int b){
   return node;
 }
 
-// Expr* ast_attrib(int v){
-//     printf("\nCALLED ATTRIB AST whit value %s\n",v);
-//     Expr* node = (Expr*)malloc(sizeof(Expr));
-//     node->kind = E_ATTRIB;
-//     node->attr.value = v;
-//     return node;
-// }
 
 Expr* ast_var(char* i){
   Expr* node = (Expr*) malloc(sizeof(Expr));
@@ -46,13 +64,6 @@ Expr* ast_var(char* i){
   return node;
 }
 
-// Expr* ast_var(char* v){
-//     printf("\nvariabale %s\n",v);
-//     Expr* node = (Expr*)malloc(sizeof(Expr));
-//     node->kind = E_VAR;
-//     node->attr.varValue = v;
-//     return node;
-// }
 
 BExpr* ast_roperation(int operator, Expr* left, Expr* right) {
   BExpr* node = (BExpr*) malloc(sizeof(BExpr));
@@ -60,6 +71,16 @@ BExpr* ast_roperation(int operator, Expr* left, Expr* right) {
   node->attr.op.operator = operator;
   node->attr.op.left = left;
   node->attr.op.right = right;
+  // printf("the rop: %d %d %d",operator,node->attr.op.left,node->attr.op.right);
+  return node;
+}
+
+BExpr* ast_rBoperation(int operator, BExpr* left, BExpr* right) {
+  BExpr* node = (BExpr*) malloc(sizeof(BExpr));
+  node->kind = E_RBOPERATION;
+  node->attr.bop.operator = operator;
+  node->attr.bop.left = left;
+  node->attr.bop.right = right;
   return node;
 }
 
@@ -76,6 +97,6 @@ Expr* ast_operation
   node->attr.op.operator = operator;
   node->attr.op.left = left;
   node->attr.op.right = right;
-  //printf("the op: %d %d %d",operator,node->attr.op.left,node->attr.op.right);
+  // printf("the op: %d %d %d",operator,node->attr.op.left,node->attr.op.right);
   return node;
 }
