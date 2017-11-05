@@ -22,11 +22,13 @@ int yyline=1;
 
 	/* definitions */
 
-
-IF ^if
-ELSE ^else
-FOR ^for
-DEC ^var
+MAIN ^func/\(\)
+IF if
+ELSE else
+FOR for
+DECLA var
+INC \+\+
+DEC \-\-
 BOOLEAN true|false
 VAR [a-zA-Z][a-zA-Z0-9]*
 BRACES \{|\}
@@ -41,6 +43,10 @@ ENDLINE ;
 %%
 
 	/* rules */
+
+{MAIN}		{
+			return MAIN;
+			}
 
 {DIGIT}+	{
 			yylval.intValue = atoi(yytext);
@@ -67,10 +73,23 @@ ENDLINE ;
 				}
 			}
 
+{INC}		{
+			if(strcmp(yytext,"++")==0){
+				return INC;
+				}
+			}
+
+{DEC}		{
+			if(strcmp(yytext,"--")==0){
+				return DEC;
+				}
+	
+			}
+
 {IF}		{ return IF;}
 {ELSE}		{ return ELSE;}
 {FOR}		{ return FOR;}
-{DEC}		{ return DECLARATION;}
+{DECLA}		{ return DECLARATION;}
 
 {VAR}		{
 			yylval.varValue = strdup(yytext);

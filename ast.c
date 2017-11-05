@@ -5,6 +5,11 @@
 #include <stdio.h>
 #include <string.h>
 
+
+CmdList* ast_commandList(Cmd* command,CmdList* list){
+  printf("gets here!!!!\n\n");
+}
+
 Cmd* ast_attrib(char *c,Expr* right){
   Cmd* node = (Cmd*) malloc(sizeof(Cmd));
   node->kind = E_ATTRIB;
@@ -39,6 +44,40 @@ Cmd* ast_for(BExpr* condition,Cmd* commands){
   node->attr.forcmd.cmd = commands;
   return node;
 }
+
+Cmd* ast_forclause(Cmd* init,BExpr* condition,Expr* post,CmdList* cmd){
+  // ṕrintf("COMMAND LIST");
+  Cmd* node = (Cmd*) malloc(sizeof(Cmd));
+  // node->kind = E_FORCLAUSE;
+  // node->attr.forclause.initStmt = init;
+  // node->attr.forclause.condition = condition;
+  // node->attr.forclause.postStmt = post;
+  // node->attr.forclause.cmd = cmd;
+  return node;
+}
+
+Cmd* ast_post(int operator,Expr* var,int i){
+  Cmd* node = (Cmd*) malloc(sizeof(Cmd));
+  Expr* expr = (Expr*) malloc(sizeof(Expr));
+  Expr* operand1 = (Expr*) malloc(sizeof(Expr));
+  Expr* operand2 = (Expr*) malloc(sizeof(Expr));
+
+  operand1->kind = E_INTEGER;
+  operand1->attr.value = var->attr.value;
+  operand2->kind = E_INTEGER;
+  operand2->attr.value = i;
+  
+  expr->kind = E_OPERATION;
+  expr->attr.op.operator = operator;
+  expr->attr.op.left = operand1;
+  expr->attr.op.right = operand2;
+  node->attr.attrib.value = expr;
+  node->kind = E_ATTRIB;
+  node->attr.attrib.variable = strdup(var->attr.var);
+  printf("%s = %d %d %i\n",strdup(var->attr.var),var->attr.value,operator,i);
+  return node;
+}
+
 
 Expr* ast_integer(int v) {
   Expr* node = (Expr*) malloc(sizeof(Expr));
@@ -100,3 +139,4 @@ Expr* ast_operation
   // printf("the op: %d %d %d",operator,node->attr.op.left,node->attr.op.right);
   return node;
 }
+

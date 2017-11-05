@@ -24,8 +24,8 @@ clean:
 
 test: $(PROGRAM)
 	$(PROGRAM) tests/testesTrabalho/example1.txt
-	$(PROGRAM) tests/testesTrabalho/exampleFor.txt
-	$(PROGRAM) tests/testesTrabalho/exampleIf.txt
-
+	$(PROGRAM) tests/testesTrabalho/exampleFunc.txt
+	
+	
 
 

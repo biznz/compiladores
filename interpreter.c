@@ -133,6 +133,30 @@ void evalCmd(Cmd* cmd, int spacing){
     evalCmd(command,spacing +2);
 
   }
+  else if(cmd->kind == E_FORCLAUSE){
+    // Cmd* initStmt = (Cmd*) malloc(sizeof(Cmd));
+    // Expr* vLeft = (Expr*) malloc(sizeof(Expr));
+    printf("for\n");
+    Cmd* init = cmd->attr.forclause.initStmt;
+    BExpr* bexpr = cmd->attr.forclause.condition;
+    Expr* expr = cmd->attr.forclause.postStmt;
+    Cmd* command = cmd->attr.forclause.cmd;
+    evalCmd(init,spacing+2);
+    evalBExpr(bexpr,spacing+2);
+    evalExpr(expr,spacing+2);
+    evalCmd(command,spacing +2);
+  }
+  else if(cmd->kind == E_IFELSE){
+    BExpr* bexpr = cmd->attr.ifelse.condition;
+    Cmd* commandLeft = cmd->attr.ifelse.cmdleft;
+    Cmd* commandRight = cmd->attr.ifelse.cmdright;
+    printTabs(spacing);
+    printf("if\n");
+    evalBExpr(bexpr,spacing+2);
+    evalCmd(commandLeft,spacing +2);
+    printf("else\n");
+    evalCmd(commandRight,spacing +2);
+  }
   else if(cmd->kind == E_ATTRIB){
     Expr* exprLeft = ast_var(cmd->attr.attrib.variable);
     exprLeft->kind = E_VAR;

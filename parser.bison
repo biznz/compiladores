@@ -22,11 +22,13 @@ Epilogue
 
 // Tokens
 %token
+  MAIN
   DECLARATION
+  INC
+  DEC
   VAR
   BOOL
   INT
-  ATTRIB
   AND
   OR
   IF
@@ -38,6 +40,7 @@ Epilogue
 /**while if print**/
 
 // Operator associativity & precedence
+%left ATTRIB
 %left EQUAL DIFFERENT GT GTE LT LTE
 %left PLUS MINUS
 %left DIVISION TIMES MOD
@@ -51,6 +54,7 @@ Epilogue
   Expr* exprValue;
   BExpr* bexprValue;
   Cmd* cmdValue;
+  CmdList* cmdListValue;
   char* varValue;
   int varIntValue;
 }
@@ -61,6 +65,7 @@ Epilogue
 %type <cmdValue> cmd
 %type <bexprValue> bexpr
 %type <varValue> VAR
+%type <cmdListValue> cmdList
 
 //trying to provide a more verbose and specific error message
 %define parse.error verbose
@@ -79,25 +84,17 @@ extern FILE* yyin;
 extern void yyerror(const char* msg);
 Expr* root;
 Cmd* cmd;
+CmdList* cmdList;
 BExpr* broot;
 }
 
 %%
 program : source
 
-source  : line 
-        | line source
+source  : main
         ;
 
-line    : cmd {cmd = $1;}
-
-cmd     : VAR ATTRIB expr ENDLINE
-          { $$ = ast_attrib($1, $3);}
-        | IF bexpr LBRACE cmd RBRACE 
-          { $$ = ast_if($2,$4);}
-        | FOR bexpr LBRACE cmd RBRACE 
-          { $$ = ast_for($2,$4);}
-        ;
+main    : MAIN LBRACE cmdList RBRACE {cmdList=$3;}
 
 expr    :
         INT { 
@@ -135,6 +132,14 @@ expr    :
         expr AND expr{
           $$ = ast_operation(AND, $1, $3);
         }
+        |
+        VAR INC ENDLINE { 
+          $$ = ast_post(PLUS,ast_var($1), 1);
+        }
+        |
+        VAR DEC ENDLINE {
+          $$ = ast_post(MINUS,ast_var($1), -1);
+        }
         ;
 
 bexpr   :
@@ -165,6 +170,27 @@ bexpr   :
         bexpr DIFFERENT bexpr{
             $$ = ast_rBoperation(DIFFERENT, $1, $3);
         }
+        ;
+
+cmdList :
+          cmd {cmd = $1;}
+        | cmd cmdList {ast_commandList($1,$2);}
+        ;
+
+cmd     : 
+        VAR ATTRIB expr ENDLINE { $$ = ast_attrib($1, $3);}
+        | 
+        IF bexpr LBRACE cmd RBRACE 
+          { $$ = ast_if($2,$4);}
+        | 
+        IF bexpr LBRACE cmd RBRACE ELSE LBRACE cmd RBRACE
+          { $$ = ast_ifelse($2,$4,$8);}
+        | 
+        FOR bexpr LBRACE cmd RBRACE 
+          { $$ = ast_for($2,$4);}
+        | 
+        FOR cmd bexpr ENDLINE expr LBRACE cmdList RBRACE
+          { $$ = ast_forclause($2,$3,$5,$7);}
         ;
 
 
