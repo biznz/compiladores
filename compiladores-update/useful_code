@@ -1,0 +1,81 @@
+| IF bexpr LBRACE cmd RBRACE
+        | FOR bexpr LBRACE cmd RBRACE 
+
+        VAR ATTRIB expr ENDLINE{ $$ = ast_attrib($1, $3);}
+
+
+{L_COMMENT}	{
+			printf("line comment %s, ",yytext);
+			}
+
+			{RES}	{
+			if(strcmp(yytext,"if")==0){
+				return IF;
+				}
+			if(strcmp(yytext,"else")==0){
+				return ELSE;
+				}
+			if(strcmp(yytext,"for")==0){
+				return FOR;
+				}
+			if(strcmp(yytext,"var")==0){
+				return DECLARATION;
+				}
+			}
+
+			RES ^if|^else|^for|^var
+
+
+xpr LT expr{
+            $$ = ast_roperation(LT, $1, $3); 
+        }
+        | 
+        expr LTE expr{
+            $$ = ast_roperation(LTE, $1, $3);
+        }
+        | 
+        expr GT expr{
+            $$ = ast_roperation(GT, $1, $3);
+        }
+        | 
+        expr GTE expr{
+            $$ = ast_roperation(GTE, $1, $3);
+        }
+        | 
+        bexpr EQUAL bexpr{
+            $$ = ast_rBoperation(EQUAL, $1, $3);
+        }
+        | 
+        bexpr DIFFERENT bexpr{
+            $$ = ast_rBoperation(DIFFERENT, $1, $3);
+        }
+        ;
+
+
+    E_BVAR,
+    E_INT,
+
+INT { 
+          $$ = ast_integer($1);
+        }
+        |
+
+
+
+	$(PROGRAM) tests/testesTrabalho/exampleFor.txt
+	$(PROGRAM) tests/testesTrabalho/exampleIf.txt
+
+	FUNC func [a-zA-Z][a-zA-Z0-9]*(){*}
+
+	source  : line 
+        | line source
+        ;
+
+line    : cmd {cmd = $1;}
+        ;
+
+|
+        FOR cmd bexpr ENDLINE expr LBRACE cmdList RBRACE
+          { $$ = ast_forclause($2,$3,$5,$7);}
+
+SSCANDEF ^"func Sscan"/\([a-zA-Z][a-zA-Z0-9]* string, [a-zA-Z][a-zA-Z0-9]* ...interface{} )
