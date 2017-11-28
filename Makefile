@@ -1,7 +1,7 @@
-OBJS=scanner.o parser.o ast.o interpreter.o
+OBJS=scanner.o parser.o ast.o code.o compiler.o
 INTERM=scanner.c parser.c parser.h
-PROGRAM=./interpreter
-CFLAGS=-g
+PROGRAM=./compiler
+CFLAGS=-g -w
 
 all: $(PROGRAM)
 

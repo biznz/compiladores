@@ -22,7 +22,10 @@ int yyline=1;
 
 	/* definitions */
 
-MAIN ^func/\(\)
+MAIN ^"func main"
+FUNC ^func/\(\)
+SSCAN ^"Sscan"
+SPRINT ^"Sprint"
 IF if
 ELSE else
 FOR for
@@ -32,20 +35,26 @@ DEC \-\-
 BOOLEAN true|false
 VAR [a-zA-Z][a-zA-Z0-9]*
 BRACES \{|\}
+PAREN \(|\)
 DIGIT [0-9]
-OP \+|\-|\*|\/|\%|\=
 LOP \&\&|\|\|
-ROP \<|\>|\<\=|\>\=|\!\=|=
+ROP \<|\>|\<\=|\>\=|!=|==
+OP \+|\-|\*|\/|\%|\=
 L_COMMENT #.*
 NW \n
 W_SPACE [ \t]
 ENDLINE ;
+COMMA ,
 %%
 
 	/* rules */
 
 {MAIN}		{
 			return MAIN;
+			}
+
+{FUNC}		{
+			return FUNC;
 			}
 
 {DIGIT}+	{
@@ -73,6 +82,16 @@ ENDLINE ;
 				}
 			}
 
+{PAREN}		{
+			char c = yytext[0];
+			if(c=='('){
+				return LPAREN;
+				}
+			if(c==')'){
+				return RPAREN;
+				}
+			}
+
 {INC}		{
 			if(strcmp(yytext,"++")==0){
 				return INC;
@@ -85,6 +104,9 @@ ENDLINE ;
 				}
 	
 			}
+
+{SSCAN}		{ return SSCAN;}
+{SPRINT}	{ return SPRINT;}
 
 {IF}		{ return IF;}
 {ELSE}		{ return ELSE;}
@@ -121,9 +143,11 @@ ENDLINE ;
 
 {ROP}		{
 			if(strcmp(yytext,"!=")==0){
+			//printf(" got a different\n");
 				return DIFFERENT;
 				}
 			if(strcmp(yytext,"==")==0){
+			printf(" got an equal\n");
 				return EQUAL;
 				}
 			if(strcmp(yytext,"<")==0){
@@ -163,6 +187,9 @@ ENDLINE ;
 
 {ENDLINE}	{
 			return ENDLINE;
+			}
+{COMMA}		{
+			return COMMA;
 			}
 
 %%

@@ -7,7 +7,19 @@
 
 
 CmdList* ast_commandList(Cmd* command,CmdList* list){
-  printf("gets here!!!!\n\n");
+  if(list==0){
+    // list->block.command = command;
+    // list->block.next = NULL;
+    CmdList* newList = (CmdList*) malloc(sizeof(CmdList));
+    newList->block.command = command;
+    newList->block.previous = NULL;
+    return newList;
+  }
+  //printf("new item in list\n");
+  CmdList* newList = (CmdList*)malloc(sizeof(CmdList));
+  newList->block.command = command;
+  newList->block.previous = list;
+  return newList;
 }
 
 Cmd* ast_attrib(char *c,Expr* right){
@@ -20,15 +32,15 @@ Cmd* ast_attrib(char *c,Expr* right){
   return node;
 }
 
-Cmd* ast_if(BExpr* condition,Cmd* commands){
+Cmd* ast_if(BExpr* condition,CmdList* commands){
   Cmd* node = (Cmd*) malloc(sizeof(Cmd));
   node->kind = E_IF;
   node->attr.ifcmd.condition = condition;
-  node->attr.ifcmd.cmd = commands;
+  node->attr.ifcmd.cmdList = commands;
   return node;
 }
 
-Cmd* ast_ifelse(BExpr* condition,Cmd* commandIf,Cmd* commandElse){
+Cmd* ast_ifelse(BExpr* condition,CmdList* commandIf,CmdList* commandElse){
   Cmd* node = (Cmd*) malloc(sizeof(Cmd));
   node->kind = E_IFELSE;
   node->attr.ifelse.condition = condition;
@@ -37,44 +49,60 @@ Cmd* ast_ifelse(BExpr* condition,Cmd* commandIf,Cmd* commandElse){
   return node;
 }
 
-Cmd* ast_for(BExpr* condition,Cmd* commands){
+Cmd* ast_for(BExpr* condition,CmdList* commands){
   Cmd* node = (Cmd*) malloc(sizeof(Cmd));
   node->kind = E_FOR;
   node->attr.forcmd.condition = condition;
-  node->attr.forcmd.cmd = commands;
+  node->attr.forcmd.cmdList = commands;
   return node;
 }
 
-Cmd* ast_forclause(Cmd* init,BExpr* condition,Expr* post,CmdList* cmd){
+Cmd* ast_forclause(Cmd* init,BExpr* condition,Expr* post,CmdList* cmdList){
   // ṕrintf("COMMAND LIST");
   Cmd* node = (Cmd*) malloc(sizeof(Cmd));
-  // node->kind = E_FORCLAUSE;
-  // node->attr.forclause.initStmt = init;
-  // node->attr.forclause.condition = condition;
-  // node->attr.forclause.postStmt = post;
-  // node->attr.forclause.cmd = cmd;
+  node->kind = E_FORCLAUSE;
+  node->attr.forclause.initStmt = init;
+  node->attr.forclause.condition = condition;
+  node->attr.forclause.postStmt = post;
+  node->attr.forclause.cmdList = cmdList;
   return node;
 }
 
-Cmd* ast_post(int operator,Expr* var,int i){
+Cmd* ast_sscan(char* var1,char* var2){
+  Cmd* node = (Cmd*) malloc(sizeof(Cmd));
+  node->kind = E_SSCAN;
+  node->attr.sscan.arg1 = strdup(var1);
+  node->attr.sscan.arg2 = strdup(var2);
+  return node;
+}
+
+Cmd* ast_sprint(char* var1){
+  Cmd* node = (Cmd*) malloc(sizeof(Cmd));
+  node->kind = E_SPRINT;
+  node->attr.sscan.arg1 = strdup(var1);
+  return node;
+}
+
+Cmd* ast_post(int operator,char* var,int i){
   Cmd* node = (Cmd*) malloc(sizeof(Cmd));
   Expr* expr = (Expr*) malloc(sizeof(Expr));
   Expr* operand1 = (Expr*) malloc(sizeof(Expr));
   Expr* operand2 = (Expr*) malloc(sizeof(Expr));
-
-  operand1->kind = E_INTEGER;
-  operand1->attr.value = var->attr.value;
+  
+  operand1->kind = E_VAR;
+  operand1->attr.var = strdup(var);
   operand2->kind = E_INTEGER;
   operand2->attr.value = i;
   
-  expr->kind = E_OPERATION;
-  expr->attr.op.operator = operator;
-  expr->attr.op.left = operand1;
-  expr->attr.op.right = operand2;
-  node->attr.attrib.value = expr;
+  //expr->kind = E_OPERATION;
+  // expr->attr.op.operator = operator;
+  // expr->attr.op.left = operand1;
+  // expr->attr.op.right = operand2;
+  // node->attr.attrib.value = ast_operation(operator,)
   node->kind = E_ATTRIB;
-  node->attr.attrib.variable = strdup(var->attr.var);
-  printf("%s = %d %d %i\n",strdup(var->attr.var),var->attr.value,operator,i);
+  //node->
+  //node->attr.attrib.variable = strdup(var->attr.var);
+  //printf("%s = %d %d %i\n",strdup(var->attr.var),var->attr.value,operator,i);
   return node;
 }
 
@@ -114,10 +142,11 @@ BExpr* ast_roperation(int operator, Expr* left, Expr* right) {
   return node;
 }
 
-BExpr* ast_rBoperation(int operator, BExpr* left, BExpr* right) {
+BExpr* ast_rboperation(int operator, Expr* left, BExpr* right) {
   BExpr* node = (BExpr*) malloc(sizeof(BExpr));
   node->kind = E_RBOPERATION;
   node->attr.bop.operator = operator;
+  //printf(" the variable %s \n",strdup(var));
   node->attr.bop.left = left;
   node->attr.bop.right = right;
   return node;

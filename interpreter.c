@@ -1,5 +1,13 @@
 #include <stdio.h>
 #include "parser.h"
+#include "code.h"
+
+
+//function prototypes
+void evalCmdList(CmdList* cmdList,int spacing);
+Expr* evalExpr(Expr* expr,int spacing);
+BExpr* evalBExpr(BExpr* bexpr,int spacing);
+void evalCmd(Cmd* cmd, int spacing);
 
 
 void printTabs(int s){
@@ -7,6 +15,18 @@ void printTabs(int s){
   for(a=0;a<s;a++){
     printf(" ");
   }
+}
+
+void evalCmdList(CmdList* cmdList,int spacing){
+    //evalCmd(cmdList->block.command,spacing);
+   evalCmd(cmdList->block.command,spacing);
+   printTabs(spacing);
+   printf(";\n");
+   //cmdList;
+   if(cmdList->block.previous!=0){
+      //printf("there is a next command\n");
+      evalCmdList(cmdList->block.previous,spacing);
+   }
 }
 
 Expr* evalExpr(Expr* expr,int spacing){
@@ -82,7 +102,24 @@ BExpr* evalBExpr(BExpr* bexpr,int spacing){
   //   printTabs(spacing);
   //   printf("%s\n",bexpr->attr.var);
   // }
-  if(bexpr->kind == E_ROPERATION){
+  if(bexpr->kind == E_RBOPERATION){
+    Expr* vLeft = (Expr*) malloc(sizeof(Expr));
+    BExpr* vRight =(BExpr*)malloc(sizeof(BExpr));
+    //vLeft= bexpr->attr.op.left;
+    vLeft = bexpr->attr.bop.left;
+    vRight = bexpr->attr.bop.right;
+    printTabs(spacing);
+    switch (bexpr->attr.op.operator) {
+      case EQUAL:
+        printf("==\n");
+        break;
+      case DIFFERENT:
+        printf("!=\n");
+        break;
+      default: yyerror("Unknown operator!");
+    }
+  }
+  else if(bexpr->kind == E_ROPERATION){
     Expr* vLeft = (Expr*) malloc(sizeof(Expr));
     Expr* vRight = (Expr*) malloc(sizeof(Expr));
     vLeft= bexpr->attr.op.left;
@@ -103,9 +140,15 @@ BExpr* evalBExpr(BExpr* bexpr,int spacing){
       case GTE:
         printf(">=\n");
         break;
+      case EQUAL:
+        printf("==\n");
+        break;
+      case DIFFERENT:
+        printf("!=\n");
+        break;
       default: yyerror("Unknown operator!");
     }
-    if(vLeft->kind == E_ROPERATION){
+    if(vLeft->kind == E_ROPERATION || vLeft->kind == E_RBOPERATION){
       evalExpr(vRight,spacing +2);
       evalExpr(vLeft,spacing +2);
     }
@@ -120,18 +163,39 @@ void evalCmd(Cmd* cmd, int spacing){
   if(cmd == 0){
     printf("Null expression!!");
   }
-  else if(cmd->kind == E_IF|| cmd->kind == E_FOR){
+  else if(cmd->kind == E_IF || cmd->kind == E_FOR){
+    BExpr* bexpr;
+    CmdList* command;
     if(cmd->kind == E_IF){
       printf("if\n");
+      bexpr = cmd->attr.ifcmd.condition;
+      command = cmd->attr.ifcmd.cmdList;
     }
-    else{
+    else if(cmd->kind == E_FOR){
       printf("for\n");
+      bexpr = cmd->attr.forcmd.condition;
+      command = cmd->attr.forcmd.cmdList;
     }
-    BExpr* bexpr = cmd->attr.ifcmd.condition;
-    Cmd* command = cmd->attr.ifcmd.cmd;
     evalBExpr(bexpr,spacing+2);
-    evalCmd(command,spacing +2);
+    evalCmdList(command,spacing +2);
 
+  }
+  else if(cmd->kind == E_SPRINT){
+    printTabs(spacing);
+    printf("sprint\n");
+    Expr* exprLeft = ast_var(cmd->attr.sprint.arg1);
+    exprLeft->kind = E_VAR;
+    evalExpr(exprLeft,spacing+2);
+  }
+  else if(cmd->kind == E_SSCAN){
+    printTabs(spacing);
+    printf("sscan\n");
+    Expr* exprLeft = ast_var(cmd->attr.sscan.arg1);
+    exprLeft->kind = E_VAR;
+    Expr* exprRight = ast_var(cmd->attr.sscan.arg1);
+    exprLeft->kind = E_VAR;
+    evalExpr(exprLeft,spacing+2);
+    evalExpr(exprRight,spacing+2);
   }
   else if(cmd->kind == E_FORCLAUSE){
     // Cmd* initStmt = (Cmd*) malloc(sizeof(Cmd));
@@ -140,22 +204,22 @@ void evalCmd(Cmd* cmd, int spacing){
     Cmd* init = cmd->attr.forclause.initStmt;
     BExpr* bexpr = cmd->attr.forclause.condition;
     Expr* expr = cmd->attr.forclause.postStmt;
-    Cmd* command = cmd->attr.forclause.cmd;
+    CmdList* command = cmd->attr.forclause.cmdList;
     evalCmd(init,spacing+2);
     evalBExpr(bexpr,spacing+2);
     evalExpr(expr,spacing+2);
-    evalCmd(command,spacing +2);
+    evalCmdList(command,spacing +2);
   }
   else if(cmd->kind == E_IFELSE){
     BExpr* bexpr = cmd->attr.ifelse.condition;
-    Cmd* commandLeft = cmd->attr.ifelse.cmdleft;
-    Cmd* commandRight = cmd->attr.ifelse.cmdright;
+    CmdList* commandLeft = cmd->attr.ifelse.cmdleft;
+    CmdList* commandRight = cmd->attr.ifelse.cmdright;
     printTabs(spacing);
     printf("if\n");
     evalBExpr(bexpr,spacing+2);
-    evalCmd(commandLeft,spacing +2);
+    evalCmdList(commandLeft,spacing +2);
     printf("else\n");
-    evalCmd(commandRight,spacing +2);
+    evalCmdList(commandRight,spacing +2);
   }
   else if(cmd->kind == E_ATTRIB){
     Expr* exprLeft = ast_var(cmd->attr.attrib.variable);
@@ -185,7 +249,8 @@ int main(int argc, char** argv) {
   do{
     if(yyparse()==0){
       int spacing = 0;
-      evalCmd(cmd,spacing);
+      printf("func main()\n");
+      //evalCmdList(cmdList,spacing);
     }
   }while(!feof(yyin));
   printf("Exiting\n");

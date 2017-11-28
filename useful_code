@@ -77,3 +77,5 @@ line    : cmd {cmd = $1;}
 |
         FOR cmd bexpr ENDLINE expr LBRACE cmdList RBRACE
           { $$ = ast_forclause($2,$3,$5,$7);}
+
+SSCANDEF ^"func Sscan"/\([a-zA-Z][a-zA-Z0-9]* string, [a-zA-Z][a-zA-Z0-9]* ...interface{} )
