@@ -22,32 +22,24 @@ struct _Address {
 };
 
 struct _Instr {
-  // enum {
-  //   ATRIBUTION, 
-  //   ADDTION, 
-  //   SUBTRACTION, 
-  //   MULTIPLICATION, 
-  //   DIVISION
-  // }
-  // op;
   enum _Opkind op;
-  struct _Address* addr1; 
+  struct _Address* addr1;
   struct _Address* addr2;
   struct _Address* addr3;
 };
 
-//typedef struct ListCode ListCode;
+//typedef struct InstrList InstrList;
 
-struct _ListCode
+struct _InstrList
 {
   struct _Instr* code;
-  struct _ListCode* next;
+  struct _InstrList* next;
 };
 
 struct _Pair
 {
 struct _Address* address;
-struct _ListCode* list;
+struct _InstrList* list;
 };
 
 typedef enum _Opkind Opkind;
@@ -55,7 +47,7 @@ typedef enum _AddrKind AddrKind;
 typedef struct _Address Address;
 typedef struct _Pair Pair;
 typedef struct _Instr Instr;
-typedef struct _ListCode ListCode;
+typedef struct _InstrList InstrList;
 // compileExpr(2*3)
 // compileExpr(2) retorna pair(2,null)
 // compileExpr(3) retorna pair(3,null)
@@ -63,10 +55,10 @@ typedef struct _ListCode ListCode;
 Instr* mKInstr(Opkind o, Address* a1, Address* a2, Address* a3);
 Address* mkAddrInt(int i);
 Address* mkAddrVar(char* c);
-ListCode* mkList(Instr* r, ListCode* l);
-Pair* mkPair(Address* c, ListCode* l); 
+InstrList* mkList(Instr* r, InstrList* l);
+Pair* mkPair(Address* c, InstrList* l); 
 
-ListCode* compile_Cmd (Cmd* c);
+InstrList* compile_Cmd (Cmd* c);
 Pair* compileExpr(Expr* e);
 
 #endif

@@ -92,10 +92,10 @@ extern int yyline;
 extern char* yytext;
 extern FILE* yyin;
 extern void yyerror(const char* msg);
-Expr* root;
+Expr* expr;
 Cmd* cmd;
 CmdList* cmdList;
-BExpr* broot;
+BExpr* bexpr;
 }
 
 %%

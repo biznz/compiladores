@@ -27,14 +27,67 @@
 
 // }
 
+void printPair(Pair* pair){
+  Instr* instr = (Instr*)malloc(sizeof(Instr));
+  printInstr(pair->list->code);
+  //instr= pair->list->code;
+  // while(instr!=NULL){
+  //   printInstr(instr);
+  // }
+}
+
+void printInstr(Instr* instr){
+  if(instr->addr1->kind == INTEGER){
+    printf(" %d ",instr->addr1->content.value);
+  }
+  else{
+    printf(" %s ",instr->addr1->content.variable);
+  }
+  switch(instr->op){
+    case ATRIBUTION:
+      {
+        printf(" = " );
+        break;
+      }
+    case ADD:
+      {
+        printf(" + " );
+        break;
+      }
+    case SUB:
+      {
+        printf(" - " );
+        break;
+      }
+    case DIV:
+      {
+        printf(" / " );
+        break;
+      }
+    case MUL:
+      {
+        printf(" * " );
+        break;
+      }
+  }
+  if(instr->addr2->kind == INTEGER){
+    printf(" %d ",instr->addr2->content.value);
+  }
+  else{
+    printf(" %s ",instr->addr2->content.variable);
+  }
+  if(instr->addr3->kind == INTEGER){
+    printf(" %d \n",instr->addr3->content.value);
+  }
+  else{
+    printf(" %s \n",instr->addr3->content.variable);
+  }
+
+}
+
 void evalCmdList3_address(CmdList* cmdList,int spacing){
-    //evalCmd(cmdList->block.command,spacing);
    evalCmd3_address(cmdList->block.command,spacing);
-   //printTabs(spacing);
-   //printf(";\n");
-   //cmdList;
    if(cmdList->block.previous!=0){
-      //printf("there is a next command\n");
       evalCmdList3_address(cmdList->block.previous,spacing);
    }
 }
@@ -44,16 +97,9 @@ void evalCmd3_address(Cmd* cmd, int spacing){
     printf("Null expression!!");
   }
   else if(cmd->kind == E_ATTRIB){
-    Pair* left = compileExpr(ast_var(cmd->attr.attrib.variable));
-    Pair* right = compileExpr(cmd->attr.attrib.value);
+    Pair* pair = compileExpr(cmd->attr.attrib.value);
+    //printPair(pair);
   }
-}
-
-void printPair(Pair* pair){
-  if(pair->name->kind==INTEGER)
-    printf("%d ",pair->name->content.value);
-  else if(pair->name->kind==VARIABLE)
-    printf("%s ",pair->name->content.variable);
 }
 
 int main(int argc, char** argv) {

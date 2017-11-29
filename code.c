@@ -9,6 +9,17 @@
 
 int varCounter = 0;
 
+/*
+  new variable generator
+
+*/
+char* newVar(){
+  //string var = "t";
+  char dest[10];
+  varCounter+=1;
+  sprintf(dest,"t%d",varCounter);
+  return dest;
+}
 
 Instr* mKInstr(Opkind o, Address* a1, Address* a2, Address* a3){
   Instr* instr = (Instr*) malloc(sizeof(Instr));
@@ -32,77 +43,123 @@ Address* mkAddrVar(char* s){
 }
 
 
-ListCode* mkList(Instr* r, ListCode* l){
-  ListCode* list = (ListCode*) malloc(sizeof(ListCode));
+InstrList* mkList(Instr* r, InstrList* l){
+  InstrList* list = (InstrList*) malloc(sizeof(InstrList));
   list->code = r;
   list->next = l;
   return list;
 }
 
-Pair* mkPair(Address* addr,ListCode* list){
+Pair* mkPair(Address* addr,InstrList* list){
   Pair* pair = (Pair*) malloc(sizeof(Pair));
   pair->address = addr;
   pair->list = list;
   return pair;
 }
 
-ListCode* append(ListCode* l1, ListCode* l2){
-  ListCode* p;
-  if(l1 == NULL) return l2;
-  for(p=l1;p->next!=NULL;p = p->next){}
-  p->next = l2;
-  return l1;
+InstrList* append(InstrList* l1, InstrList* l2){
+  InstrList* p = (InstrList*) malloc(sizeof(InstrList));;
+  if(l2) return l1;
+  // for(p=l1;p->next!=NULL;p = p->next){}
+  // p->next = l2;
+  // return l1;
+  return NULL;
 }
 
+/*
+  function compiles an Expression into 3
+  address instructions
+*/
 
+void printAddress(Address* address){
+  printf("-----Address----\n");
+  if(address->kind == INTEGER){
+    printf(" %d ",address->content.value);
+  }
+  else{
+    printf(" %s ",address->content.variable);
+  }
+}
 
 Pair* compileExpr(Expr* e){
-  Pair* result = (Pair*) malloc(sizeof(Pair));
-  Pair* p1 = (Pair*) malloc(sizeof(Pair));
-  Pair* p2 = (Pair*) malloc(sizeof(Pair));
-  Instr* intruction = (Instr*) malloc(sizeof(Instr));
-  char* t;
+  // Pair* result = (Pair*) malloc(sizeof(Pair));
+  // Pair* p1 = (Pair*) malloc(sizeof(Pair));
+  // Pair* p2 = (Pair*) malloc(sizeof(Pair));
+  // Instr* instruction = (Instr*) malloc(sizeof(Instr));
+  // InstrList* list;
+  // char* t;
   //Address addr = 
   if(e->kind == E_INTEGER){
     //mkPair(e,NULL);
     Address* intAddress = mkAddrInt(e->attr.value);
-    Pair* pair = mkPair(intAddress,NULL);
-    return pair;
+    printAddress(intAddress);
+    result = mkPair(intAddress,NULL);
+    return result;
   }
   if(e->kind == E_VAR){
     Address* varAddress = mkAddrVar(e->attr.var);
-    Pair* pair = mkPair(varAddress,NULL);
-    return pair;
+    printAddress(varAddress);
+    result = mkPair(varAddress,NULL);
+    return result;
   }
-  //e->kind = E_VAR;
-
   switch(e->attr.op.operator){
-    case PLUS: {
-              p1 = compileExpr(e->attr.op.left);
-              p2 = compileExpr(e->attr.op.right);
-              t  = mewVar();
-              result  = append(p1->list, p2->list);
-              instr = mKInstr(ADD,mkAddrVar(t),p1->address,p2->address);
-              break;
-              }
+    case PLUS:
+      {
+        instruction = mKInstr(ADD,mkAddrVar(t),p1->address,p2->address);
+        printf("PLUS\n");
+        break;
+      }
+      case SUB:
+        {
+          instruction = mKInstr(SUB,mkAddrVar(t),p1->address,p2->address);
+          printf("SUB\n");
+          break;
+        }
+    case MUL:
+        {
+          instruction = mKInstr(MUL,mkAddrVar(t),p1->address,p2->address);
+          printf("MUL\n");
+          break;
+        }
+    case DIV:
+        {
+          instruction = mKInstr(DIV,mkAddrVar(t),p1->address,p2->address);
+          printf("DIV\n");
+          break;
+        }
   }
-  result = mkPair(mkAddrVar(t), append(result, mKInstr(ADD, mkAddrVar(t), p1->address, p2->address)), NULL)); 
-    //return (mkPair())
-  return result;
-  }
-
-
-  ListCode* compileCmd(Cmd *cmd){
+  append(list,mkList(instruction,NULL));
   return NULL;
+  //char * newvar = newVar();
+  //return mkPair(mkAddrVar(newvar),append(list,mkList(instruction,NULL)));
+  // switch(e->attr.op.operator){
+  //   case PLUS: 
+  //       {
+  //         instruction = mKInstr(ADD,mkAddrVar(t),p1->address,p2->address);
+  //         break;
+  //       }
+  //   case SUB:
+  //       {
+  //         instruction = mKInstr(SUB,mkAddrVar(t),p1->address,p2->address);
+  //         break;
+  //       }
+  //   case MUL:
+  //       {
+  //         instruction = mKInstr(MUL,mkAddrVar(t),p1->address,p2->address);
+  //         break;
+  //       }
+  //   case DIV:
+  //       {
+  //         instruction = mKInstr(DIV,mkAddrVar(t),p1->address,p2->address);
+  //         break;
+  //       }
+  // }
+  // return mkPair(mkAddrVar(newVar()),append(list,mkList(instruction,NULL)));
+  //return NULL;
 }
 
-char* newVar(){
-  //string var = "t";
-  char dest[5];
-  char* var="t";
-  varCounter++;
-  char* c = varCounter +'0';
-  strcpy(dest,var);
-  strcat(dest,c);
-  return dest;
+
+
+InstrList* compileCmd(Cmd *cmd){
+  return NULL;
 }

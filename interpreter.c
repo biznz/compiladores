@@ -227,8 +227,6 @@ void evalCmd(Cmd* cmd, int spacing){
     Expr* exprRight = cmd->attr.attrib.value;
     printTabs(spacing);
     printf("=\n");
-    // printf("left:%d ",exprLeft->attr.value);
-    // printf("right:%d\n",exprRight->attr.value);
     evalExpr(exprLeft,spacing+2);
     evalExpr(exprRight,spacing+2);
   }
@@ -250,7 +248,7 @@ int main(int argc, char** argv) {
     if(yyparse()==0){
       int spacing = 0;
       printf("func main()\n");
-      //evalCmdList(cmdList,spacing);
+      evalCmdList(cmdList,spacing);
     }
   }while(!feof(yyin));
   printf("Exiting\n");
