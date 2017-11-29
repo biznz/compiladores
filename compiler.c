@@ -27,63 +27,16 @@
 
 // }
 
-void printPair(Pair* pair){
-  Instr* instr = (Instr*)malloc(sizeof(Instr));
-  printInstr(pair->list->code);
-  //instr= pair->list->code;
-  // while(instr!=NULL){
-  //   printInstr(instr);
-  // }
-}
+// void printPair(Pair* pair){
+//   Instr* instr = (Instr*)malloc(sizeof(Instr));
+//   printInstr(pair->list->code);
+//   //instr= pair->list->code;
+//   // while(instr!=NULL){
+//   //   printInstr(instr);
+//   // }
+// }
 
-void printInstr(Instr* instr){
-  if(instr->addr1->kind == INTEGER){
-    printf(" %d ",instr->addr1->content.value);
-  }
-  else{
-    printf(" %s ",instr->addr1->content.variable);
-  }
-  switch(instr->op){
-    case ATRIBUTION:
-      {
-        printf(" = " );
-        break;
-      }
-    case ADD:
-      {
-        printf(" + " );
-        break;
-      }
-    case SUB:
-      {
-        printf(" - " );
-        break;
-      }
-    case DIV:
-      {
-        printf(" / " );
-        break;
-      }
-    case MUL:
-      {
-        printf(" * " );
-        break;
-      }
-  }
-  if(instr->addr2->kind == INTEGER){
-    printf(" %d ",instr->addr2->content.value);
-  }
-  else{
-    printf(" %s ",instr->addr2->content.variable);
-  }
-  if(instr->addr3->kind == INTEGER){
-    printf(" %d \n",instr->addr3->content.value);
-  }
-  else{
-    printf(" %s \n",instr->addr3->content.variable);
-  }
 
-}
 
 void evalCmdList3_address(CmdList* cmdList,int spacing){
    evalCmd3_address(cmdList->block.command,spacing);
@@ -98,6 +51,7 @@ void evalCmd3_address(Cmd* cmd, int spacing){
   }
   else if(cmd->kind == E_ATTRIB){
     Pair* pair = compileExpr(cmd->attr.attrib.value);
+    printInstrList(pair->list);
     //printPair(pair);
   }
 }
