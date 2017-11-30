@@ -51,7 +51,7 @@ void evalCmd3_address(Cmd* cmd, int spacing){
   }
   else if(cmd->kind == E_ATTRIB){
     Pair* pair = compileExpr(cmd->attr.attrib.value);
-    printInstrList(pair->list);
+    printPair(pair);
     //printPair(pair);
   }
 }

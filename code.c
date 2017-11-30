@@ -24,7 +24,7 @@ char* newVar(){
 }
 
 Instr* mKInstr(Opkind o, Address* a1, Address* a2, Address* a3){
-  //printf("GETS HERE to mkinstr\n");
+  printf("GETS HERE to mkinstr\n");
   Instr* instr = (Instr*) malloc(sizeof(Instr));
   instr->op = o;
   instr->addr1 = a1;
@@ -76,11 +76,20 @@ void printInstr(Instr* instr){
     printf("caught null in list instr\n");
     return;
   }
-  else if(instr->addr1->kind == INTEGER){
-    printf(" %d ",instr->addr1->content.value);
+  if(instr->addr1){
+    if(instr->addr1->kind == INTEGER){
+      printf(" %d ",instr->addr1->content.value);
+    }
+    else{
+      printf(" %s = ",instr->addr1->content.variable);
+    }
+  }
+  if(instr->addr2){
+  if(instr->addr2->kind == INTEGER){
+    printf(" %d ",instr->addr2->content.value);
   }
   else{
-    printf(" %s ",instr->addr1->content.variable);
+    printf(" %s ",instr->addr2->content.variable);
   }
   switch(instr->op){
     case ATRIBUTION:
@@ -109,27 +118,28 @@ void printInstr(Instr* instr){
         break;
       }
   }
-  if(instr->addr2->kind == INTEGER){
-    printf(" %d ",instr->addr2->content.value);
-  }
-  else{
-    printf(" %s ",instr->addr2->content.variable);
-  }
+}
+  if(instr->addr3){
   if(instr->addr3->kind == INTEGER){
     printf(" %d \n",instr->addr3->content.value);
   }
   else{
     printf(" %s \n",instr->addr3->content.variable);
   }
+}
 
 }
 
 InstrList* append(InstrList* l1, InstrList* l2){
+  printf("\ncalling append\n");
   InstrList* p = (InstrList*) malloc(sizeof(InstrList));;
   if(!l1) return l2;
+  printf("\nl1 is not null\n");
   for(p=l1;p->next!=NULL;p = p->next){
+    //printInstr(p->code);
     p->next = l2;
   }
+  //printInstrList(p);
   return p;
 }
 
@@ -158,10 +168,13 @@ void printAddress(Address* address){
 void printInstrList(InstrList* list){
   if(!list) printf("List is NULL\n");
   else{
+    printf(" list is not null\n");
     InstrList* p = (InstrList*) malloc(sizeof(InstrList));;
+    printInstr(list->code);
     for(p=list;p->next!=NULL;p = p->next){
-    printInstr(p->code);
-    p->next = list->next;
+      printf("\nprinting instruction\n");
+      printInstr(p->code);
+      p->next = list->next;
     }
   }
 }
@@ -175,6 +188,9 @@ void printInstrList(InstrList* list){
 
 
 Pair* compileExpr(Expr* e){
+   printf("current expr -------\n");
+   printExpr(e);
+   printf("\n----------\n");
   if(e->kind == E_INTEGER){
     Address* intAddress = mkAddrInt(e->attr.value);
     return mkPair(intAddress,NULL);
@@ -190,8 +206,8 @@ Pair* compileExpr(Expr* e){
   //printInstrList(append(p1->list,p2->list));
   InstrList* l;
   Instr* instr;
+  printf("\ncalling first append\n");
   l = append(p1->list,p2->list);
-  printInstrList(l);
   char* var = newVar();
   switch(e->attr.op.operator){
     case PLUS:{
@@ -214,7 +230,9 @@ Pair* compileExpr(Expr* e){
     }
   }
   //return NULL;
-  printInstr(instr);
+  //printInstrList(l);
+  //printInstr(instr);
+  printf("\ncalling second append\n");
   return mkPair(mkAddrVar(newVar()),append(l,mkList(instr,NULL)));
 }
 

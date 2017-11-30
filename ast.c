@@ -158,6 +158,20 @@ BExpr* ast_rboperation(int operator, Expr* left, BExpr* right) {
   list.expr =
 }*/
 
+void printExpr(Expr* expr){
+  if(expr->kind == E_INTEGER){
+    printf(" %d ",expr->attr.value);
+  }
+  else if(expr->kind == E_VAR){
+    printf(" %s ",expr->attr.var);
+  }
+  else{
+    printExpr(expr->attr.op.left);
+    printf(" %d ",expr->attr.op.operator);
+    printExpr(expr->attr.op.right);
+  }
+}
+
 Expr* ast_operation
 (int operator, Expr* left, Expr* right) {
   Expr* node = (Expr*) malloc(sizeof(Expr));
