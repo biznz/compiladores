@@ -6,7 +6,19 @@
 #include "ast.h"
 
 enum _Opkind{
-  ATRIBUTION, ADD, SUB, MUL, DIV
+  ATRIBUTION, 
+  ADD, 
+  SUB, 
+  MUL, 
+  DIV,
+  GOTO,
+  LABEL,
+  LTHEN,
+  LTEQUAL,
+  GTHEN,
+  GTEQUAL,
+  EQ,
+  DIFF
 };
 
 enum _AddrKind{
@@ -34,6 +46,7 @@ struct _InstrList
 {
   struct _Instr* code;
   struct _InstrList* next;
+  struct _InstrList* head;
 };
 
 struct _Pair
@@ -57,7 +70,9 @@ Address* mkAddrInt(int i);
 Address* mkAddrVar(char* c);
 InstrList* mkList(Instr* r, InstrList* l);
 Pair* mkPair(Address* c, InstrList* l); 
-
+void printInstr(Instr* instr);
+void printInstrList(InstrList* list);
+InstrList* append(InstrList* l1, InstrList* l2);
 InstrList* compile_Cmd (Cmd* c);
 Pair* compileExpr(Expr* e);
 

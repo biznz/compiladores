@@ -61,6 +61,7 @@ struct _Cmd{
     union {
       struct{
         char* variable;
+        //struct _Expr* var;
         struct _Expr* value;  
       }attrib;
       struct{

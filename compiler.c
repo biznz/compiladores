@@ -49,10 +49,25 @@ void evalCmd3_address(Cmd* cmd, int spacing){
   if(cmd == 0){
     printf("Null expression!!");
   }
+  else if(cmd->kind == E_IF){
+    //Pair* ifcmd = 
+    compileIF(cmd);
+  }
   else if(cmd->kind == E_ATTRIB){
     Pair* pair = compileExpr(cmd->attr.attrib.value);
-    printPair(pair);
+    //Expr* variable = ast_var(cmd->attr.attrib.variable);
+    //Pair* the_var = compileExpr(variable);
+    //Instr* varInstr = mkInstr(ATRIBUTION,the_var->address,pair->address,NULL);
+    //Pair* varPair*
     //printPair(pair);
+  }
+  else if(cmd->kind == E_IFELSE){
+  }
+  else if(cmd->kind == E_FOR){
+    
+  }
+  else if(cmd->kind == E_FORCLAUSE){
+    
   }
 }
 
