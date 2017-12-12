@@ -1,5 +1,5 @@
 func main(){
-	a = b + c * x;
+#	a = b + c * x;
 	t = 1;
 #	z = 2 + 3;
 # x = 2 + 1;

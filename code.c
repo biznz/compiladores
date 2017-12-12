@@ -195,13 +195,14 @@ void printOpKind(Instr* instr){
 
 void printInstr(Instr* instr){
   if(!instr){
-    printf("THIS INSTRUCTION IS NULL\n");
+    //printf("THIS INSTRUCTION IS NULL\n");
     return;
   }
   if(comparison(instr) == 1){
-    printf(" %s: ",instr->addr3->content.variable);
-    printf("if ");
+    printf(" %s: \n",instr->addr3->content.variable);
+    printf(" if ");
     if(instr->addr1->kind == INTEGER){
+      //print
       printf(" %d ",instr->addr1->content.value);
     }
     else{
@@ -257,7 +258,7 @@ InstrList* append(InstrList* l1, InstrList* l2){
 PairList* appendList(PairList* l1, PairList* l2){
   if(!l1){return l2;}
   PairList* p;
-  for(p=l1;p->pair!=NULL;p->next);
+  for(p=l1;p->next!=NULL;p = p->next);
     p->next = l2;
   return l1;
 }
@@ -301,10 +302,15 @@ void printInstrList(InstrList* list){
 
 
 void printPairList(PairList* list){
-    if(!list) return;
-    Pair* pair = list->pair;
-    //printPair(pair);
+    if(list){
+
+      //printf(" pair List not null \n");
+      printPair(list->pair);
+      printf("\n");
+      printPairList(list->next);
+      }
     //printPairList(list->next);
+    return;
 }
 
 /*
@@ -315,29 +321,54 @@ void printPairList(PairList* list){
 
 PairList* compileCmdList(CmdList* cmdList){
   PairList* pairList = (PairList*) malloc(sizeof(PairList));
+  Cmd* cmd = (Cmd*) malloc(sizeof(Cmd*));
+  cmd = cmdList->block.command;
+  Pair* pair = compileCmd(cmd);
+  //printPair(pair);
+  PairList* newList = mkPairList(pair,NULL);
+  //printPairList(newList);
+  pairList = appendList(NULL,newList);
+  //printPairList(pairList);
   do{
-    printf("here\n");
-    Cmd* cmd = (Cmd*) malloc(sizeof(Cmd*));
-    cmd = cmdList->block.command;
-    Pair* pair = compileCmd(cmd);
-    //printPair(pair);
-    PairList* newList = mkPairList(pair,NULL);
-    pairList = append(pairList,newList);
-    if(cmdList->block.previous!=0)
-      cmdList=cmdList->block.previous;
-    //printf("here\n");
-
+    if(cmdList->block.previous!=0){cmdList=cmdList->block.previous;}
+    pair = compileCmd(cmdList->block.command);
+    newList = mkPairList(pair,NULL);
+    pairList = appendList(pairList,newList);
   }while(cmdList->block.previous!=0);
   return pairList;
 }
 
+/**
+  this function builds an instruction list
+  from a set of instrLists of a pairLIst
+**/
+
+InstrList* buildInstrListFromPairList(PairList* list){
+  printf("building instruction List\n");
+  InstrList* instrList = (InstrList*) malloc(sizeof(InstrList));
+  //instrList = mkList(NULL,NULL);
+  Pair* pair = list->pair;
+  //printPair(pair);
+  //return;
+  instrList = mkList(NULL,pair->list);
+  //printInstrList(instrList);
+  do{
+      if(list->next!=0){list=list->next;}
+      InstrList* holder = list->pair->list;
+      instrList = append(instrList,holder);
+      //printInstrList(instrList);
+  }while(list->next!=0);
+  //printInstrList(instrList);
+  printf("Exiting building instruction list\n");
+  return instrList;
+}
 
 Pair* compileCmd(Cmd *cmd){
   if(cmd == 0){
     printf("Null expression!!");
   }
   else if(cmd->kind == E_IF){
-    
+    //printf("starts building the if\n");
     Pair* the_var = compileExpr(cmd->attr.ifcmd.condition->attr.op.left);
     Pair* pair = compileExpr(cmd->attr.ifcmd.condition->attr.op.right);
     
@@ -358,8 +389,8 @@ Pair* compileCmd(Cmd *cmd){
     Pair* t2Pair = mkPair(addr2,t1List);
 
 
-    printPair(t1Pair);
-    printPair(t2Pair);
+    //printPair(t1Pair);
+    //printPair(t2Pair);
 
     //printPair(the_var);
     //printPair(pair);
@@ -376,11 +407,18 @@ Pair* compileCmd(Cmd *cmd){
     Address* labelAddress = mkAddrVar(label1);
     //printf("if ");
     Instr* instr = mKInstr(convertOp(cmd->attr.ifcmd.condition->attr.op.operator),t1Pair->address,t2Pair->address,labelAddress);
-    InstrList* result = mkList(instr,NULL);
+    PairList* cmd1 = compileCmdList(cmd->attr.ifcmd.cmdList);
+    //printPairList(cmd1);
+
+    InstrList* list1 = buildInstrListFromPairList(cmd1);
+    
+    //Instr* gotoI = mKInstr()
+    InstrList* result = mkList(instr,list1);
     Pair* ifPair = mkPair(labelAddress,result);
+    //printf("returns the if pair\n");
     return ifPair;
     //printInstrList(result);
-    printf("------------------\n");
+    //printf("------------------\n");
 
     //evalCmdList3_address(cmd->attr.ifcmd.cmdList,0);
   }
