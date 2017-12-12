@@ -147,7 +147,7 @@ COMMA ,
 				return DIFFERENT;
 				}
 			if(strcmp(yytext,"==")==0){
-			printf(" got an equal\n");
+			//printf(" got an equal\n");
 				return EQUAL;
 				}
 			if(strcmp(yytext,"<")==0){

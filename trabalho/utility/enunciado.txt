@@ -1,0 +1,60 @@
+compilador go
+
+2) parte do enunciado
+MIPS
+
+gramatica
+
+expressoes aritmeticas
+
+bison
+
+struct Expr
+---
+
+expressoes booleanas
+
+struct BExpr pode ser utilizada a mesma estrutura aritmetica 
+ja existente em ast.h. 0 false 1 para true
+
+---
+
+comando(nao calcula valor atribui valor)
+
+gramatica para comandos
+
+if-then-else
+for/while
+
+sequencia(lista ligada de comandos | head comando, tail comandos)
+
+struct cmd
+
+
+||notas
+flex ciclo de \n** retornar \n
+----------------------------------------------
+imprimir arvore sintatica --
+(estrutura identica ao interpretador)
+/sugestao como arvore de directorios
+
+(estrutura identica ao interpretador)
+/sugestao como arvore de directorios
+
+1a fase construir arvore sintatica
+
+correccao sprint prinf
+
+
+x = 2 + 3
+
+y = x
+
+=
+ x
+  +
+  2
+  3
+=
+ y
+ x

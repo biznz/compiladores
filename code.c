@@ -59,6 +59,12 @@ InstrList* mkList(Instr* r, InstrList* l){
   return list;
 }
 
+PairList* mkPairList(Pair* pair,PairList* list){
+  PairList* pairList= (PairList*) malloc(sizeof(PairList));
+  pairList->pair = pair;
+  pairList->next = list;
+}
+
 Pair* mkPair(Address* addr,InstrList* list){
   Pair* pair = (Pair*) malloc(sizeof(Pair));
   pair->address = addr;
@@ -67,29 +73,70 @@ Pair* mkPair(Address* addr,InstrList* list){
 }
 
 
-void printInstr(Instr* instr){
-  if(!instr){
-    printf("THIS INSTRUCTION IS NULL\n");
-    return;
+Opkind convertOp(int op){
+  switch(op){
+    case EQUAL:{
+      //printf("EQUAL\n");
+      return EQ;
+    }
+    case DIFFERENT:{
+      //printf("DIFF\n");
+      return DIFF;
+    }
+    case GT:{
+      //printf("GT\n");
+      return GTHEN;
+    }
+    case GTE:{
+      //printf("GTE\n");
+      return GTEQUAL;
+    }
+    case LT:{
+      //printf("LT\n");
+      return LTHEN;
+    }
+    case LTE:{
+      //printf("LTE\n");
+      return LTEQUAL;
+    }
   }
-  if(instr->addr1->kind == INTEGER){
-      printf(" %d ",instr->addr1->content.value);
-  }
-  else{
-      printf(" %s = ",instr->addr1->content.variable);
-  }
-  if(instr->addr2->kind == INTEGER){
-    printf(" %d ",instr->addr2->content.value);
-  }
-  else{
-    printf(" %s ",instr->addr2->content.variable);
-  }
+}
+
+
+int comparison(Instr* instr){
   switch(instr->op){
     case ATRIBUTION:
       {
-        printf(" = " );
+        return 0;
         break;
       }
+    case ADD:
+      {
+        return 0;
+        break;
+      }
+    case SUB:
+      {
+        return 0;
+        break;
+      }
+    case DIV:
+      {
+        return 0;
+        break;
+      }
+    case MUL:
+      {
+        return 0;
+        break;
+      }
+    default:
+      return 1;
+  }
+}
+
+void printOpKind(Instr* instr){
+  switch(instr->op){
     case ADD:
       {
         printf(" + " );
@@ -110,29 +157,109 @@ void printInstr(Instr* instr){
         printf(" * " );
         break;
       }
+    case LTHEN:
+      {
+        printf(" lthen");
+        break;
+      }
+    case LTEQUAL:
+      {
+        printf(" lthen");
+        break;
+      }
+    case GTHEN:
+      {
+        printf(" lthen");
+        break;
+      }
+    case GTEQUAL:
+      {
+        printf(" lthen");
+        break;
+      }
+    case EQ:
+      {
+        printf(" lthen");
+        break;
+      }
+    case DIFF:
+      {
+        printf(" lthen");
+        break;
+      }
+    }
+}
+
+//Instr* createInstruction()
+
+
+void printInstr(Instr* instr){
+  if(!instr){
+    printf("THIS INSTRUCTION IS NULL\n");
+    return;
   }
-  if(instr->addr3){
-    if(instr->addr3->kind == INTEGER){
-    printf(" %d ",instr->addr3->content.value);
+  if(comparison(instr) == 1){
+    printf(" %s: ",instr->addr3->content.variable);
+    printf("if ");
+    if(instr->addr1->kind == INTEGER){
+      printf(" %d ",instr->addr1->content.value);
     }
     else{
+      printf(" %s ",instr->addr1->content.variable);
+    }
+    printOpKind(instr);
+    if(instr->addr2->kind == INTEGER){
+      printf(" %d ",instr->addr2->content.value);
+    }
+    else{
+      printf(" %s ",instr->addr2->content.variable);
+    }
+    printf(" goto ");
     printf(" %s ",instr->addr3->content.variable);
+    //printOpKind(instr);
+
+  }
+   else{
+    if(instr->addr1->kind == INTEGER){
+        printf(" %d ",instr->addr1->content.value);
+    }
+    else{
+        printf(" %s = ",instr->addr1->content.variable);
+    }
+    if(instr->addr2->kind == INTEGER){
+      printf(" %d ",instr->addr2->content.value);
+    }
+    else{
+      printf(" %s ",instr->addr2->content.variable);
+    }
+    printOpKind(instr);
+    if(instr->addr3){
+      if(instr->addr3->kind == INTEGER){
+    printf(" %d ",instr->addr3->content.value);
+      }
+    else{
+    printf(" %s ",instr->addr3->content.variable);
+      }
     }
   }
 
 }
 
 InstrList* append(InstrList* l1, InstrList* l2){
-  //printf("append\n");
   if(!l1){
     return l2;}
-  InstrList* p = (InstrList*) malloc(sizeof(InstrList));
-  for(p=l1;p->next!=NULL;p = p->next){
-   }
-   p->next = (InstrList*) malloc(sizeof(InstrList));
-   p->next->code = l2->code;
-   p->next->next= l2->next;
-  return p;
+  InstrList* p;
+  for(p=l1;p->next!=NULL;p = p->next);
+    p->next = l2;
+  return l1;
+}
+
+PairList* appendList(PairList* l1, PairList* l2){
+  if(!l1){return l2;}
+  PairList* p;
+  for(p=l1;p->pair!=NULL;p->next);
+    p->next = l2;
+  return l1;
 }
 
 
@@ -140,9 +267,10 @@ InstrList* append(InstrList* l1, InstrList* l2){
 void printPair(Pair* pair){
   if(pair){
     //printf("the address----> ");
-    printAddress(pair->address);
+    //printAddress(pair->address);
     //printf("the instruction list----> ");
-    printInstrList(pair->list);
+    if(pair->list)
+      printInstrList(pair->list);
   }
   else{
     printf("got a null pair");
@@ -164,83 +292,123 @@ void printInstrList(InstrList* list){
     return;
   }
   InstrList* p = (InstrList*) malloc(sizeof(InstrList));
-  //printf("IN print instruction---->");
-  printf("[ ");
-  printInstr(list->code);
-  printf(" , ");
-  for(p=list;p->next!=NULL;p = p->next){
-    // printf("\nwithin the for loop-->");
+  for(p=list;p!=NULL;p = p->next){
     printInstr(p->code);
-    printf(" , ");
+    printf("\n");
    }
-   printf(" ];\n");
    return;
 }
 
 
+void printPairList(PairList* list){
+    if(!list) return;
+    Pair* pair = list->pair;
+    //printPair(pair);
+    //printPairList(list->next);
+}
 
 /*
   function creates from Expression 3
   address instructions
 */
 
-void compileIF(Cmd* cmd){
-  Pair* t1 = compileExpr(cmd->attr.ifcmd.condition->attr.op.left);
-  Pair* t2 = compileExpr(cmd->attr.ifcmd.condition->attr.op.right);
-  char* label1 = newLabel();
-  Instr* instr;
-  switch(cmd->attr.ifcmd.condition->attr.op.operator){ 
-    case EQUAL:{
-      // printf(" if %s EQUAL %s GOTO %s",t1->address->content.variable,
-      //   t2->address->content.variable,
-      //   label1);
-      instr = mKInstr(EQ,t1->address,t2->address,mkAddrVar(label1));
-      break;
-    }
-    case DIFFERENT:{
-      instr = mKInstr(DIFF,t1->address,t2->address,mkAddrVar(label1));
-      break;
-    }
-    case GT:{
-      // printf(" if %s GT %s GOTO %s",t1->address->content.variable,
-      //   t2->address->content.variable,
-      //   label1);
-      instr = mKInstr(GTHEN,t1->address,t2->address,mkAddrVar(label1));
-      break;
-    }
-    case GTE:{
-      instr = mKInstr(GTEQUAL,t1->address,t2->address,mkAddrVar(label1));
-      break;
-    }
-    case LT:{
-      printf(" if ");
-      printPair(t1);
-      printf(" LTHEN ");
-      printPair(t2);
-      printf(" GOTO %s\n",label1);
-      //printf(" if %s LTHEN %s GOTO %s",t1->address->content.variable,t2->address->content.variable,label1);
-      instr = mKInstr(LTHEN,t1->address,t2->address,mkAddrVar(label1));
-      break;
-    }
-    case LTE:{
-      instr = mKInstr(LTEQUAL,t1->address,t2->address,mkAddrVar(label1));
-      break;
-    }
-  }
-  printf("%s: ",label1);
-  evalCmdList3_address(cmd->attr.ifcmd.cmdList,0);
+
+PairList* compileCmdList(CmdList* cmdList){
+  PairList* pairList = (PairList*) malloc(sizeof(PairList));
+  do{
+    printf("here\n");
+    Cmd* cmd = (Cmd*) malloc(sizeof(Cmd*));
+    cmd = cmdList->block.command;
+    Pair* pair = compileCmd(cmd);
+    //printPair(pair);
+    PairList* newList = mkPairList(pair,NULL);
+    pairList = append(pairList,newList);
+    if(cmdList->block.previous!=0)
+      cmdList=cmdList->block.previous;
+    //printf("here\n");
+
+  }while(cmdList->block.previous!=0);
+  return pairList;
 }
 
+
+Pair* compileCmd(Cmd *cmd){
+  if(cmd == 0){
+    printf("Null expression!!");
+  }
+  else if(cmd->kind == E_IF){
+    
+    Pair* the_var = compileExpr(cmd->attr.ifcmd.condition->attr.op.left);
+    Pair* pair = compileExpr(cmd->attr.ifcmd.condition->attr.op.right);
+    
+    char* var1 = newVar();
+    Address* addr1 = mkAddrVar(var1);
+    char* var2 = newVar();
+    Address* addr2 = mkAddrVar(var2);
+    
+    Instr* t1 = mKInstr(ATRIBUTION,addr1,the_var->address,NULL);
+    Instr* t2 = mKInstr(ATRIBUTION,addr2,pair->address,NULL);
+
+    InstrList* t1List = mkList(t1,NULL);
+    t1List = append(the_var->list,t1List);
+    Pair* t1Pair = mkPair(addr1,t1List);
+
+    InstrList* t2List = mkList(t2,NULL);
+    t1List = append(pair->list,t2List);
+    Pair* t2Pair = mkPair(addr2,t1List);
+
+
+    printPair(t1Pair);
+    printPair(t2Pair);
+
+    //printPair(the_var);
+    //printPair(pair);
+    //printf("\n");
+
+    Instr* varInstr = mKInstr(ATRIBUTION,the_var->address,pair->address,NULL);
+    InstrList* list = mkList(varInstr,NULL);
+    list = append(pair->list,list);
+    Pair* new_pair = mkPair(the_var->address,list);
+    //printPair(new_pair);
+
+
+    char* label1 = newLabel();
+    Address* labelAddress = mkAddrVar(label1);
+    //printf("if ");
+    Instr* instr = mKInstr(convertOp(cmd->attr.ifcmd.condition->attr.op.operator),t1Pair->address,t2Pair->address,labelAddress);
+    InstrList* result = mkList(instr,NULL);
+    Pair* ifPair = mkPair(labelAddress,result);
+    return ifPair;
+    //printInstrList(result);
+    printf("------------------\n");
+
+    //evalCmdList3_address(cmd->attr.ifcmd.cmdList,0);
+  }
+  else if(cmd->kind == E_ATTRIB){
+    //printf("HERE attrib\n");
+    Pair* pair = compileExpr(cmd->attr.attrib.value);
+    Expr* variable = ast_var(cmd->attr.attrib.variable);
+    Pair* the_var = compileExpr(variable);
+    //printf("HERE attrib\n");
+    Instr* varInstr = mKInstr(ATRIBUTION,the_var->address,pair->address,NULL);
+    InstrList* list = mkList(varInstr,NULL);
+    //printInstrList(list);
+    list = append(pair->list,list);
+    Pair* new_pair = mkPair(the_var->address,list);
+    return new_pair;
+  }
+}
+
+
 Pair* compileExpr(Expr* e){
+  //printf("compileExpr int\n");
   if(e->kind == E_INTEGER){
     Address* intAddress = mkAddrInt(e->attr.value);
     return mkPair(intAddress,NULL);
   }
   if(e->kind == E_VAR){
-    //printf("THIS IS A VARIABLE ");
+    //printf("compileExpr char\n");
     Address* varAddress = mkAddrVar(e->attr.var);
-    printAddress(varAddress);
-    //printf("\n");
     return mkPair(varAddress,NULL);
   }
   Pair* p1 = compileExpr(e->attr.op.left);
@@ -269,93 +437,9 @@ Pair* compileExpr(Expr* e){
       break;
     }
   }
-  printInstr(instr);
-  printf("\n");
   InstrList* listToAppend = mkList(instr,NULL);
-  l=append(l,listToAppend);
-  Pair* newPair = mkPair(address,l);
+  InstrList * l3;
+  l3=append(l,listToAppend);
+  Pair* newPair = mkPair(address,l3);
   return newPair;
-}
-
-// Pair* compileExpr(Expr* e){
-//   // Pair* result = (Pair*) malloc(sizeof(Pair));
-//   // Pair* p1 = (Pair*) malloc(sizeof(Pair));
-//   // Pair* p2 = (Pair*) malloc(sizeof(Pair));
-//   // Instr* instruction = (Instr*) malloc(sizeof(Instr));
-//   // InstrList* list;
-//   // char* t;
-//   //Address addr = 
-//   if(e->kind == E_INTEGER){
-//     //mkPair(e,NULL);
-//     Address* intAddress = mkAddrInt(e->attr.value);
-//     printAddress(intAddress);
-//     result = mkPair(intAddress,NULL);
-//     return result;
-//   }
-//   if(e->kind == E_VAR){
-//     Address* varAddress = mkAddrVar(e->attr.var);
-//     printAddress(varAddress);
-//     result = mkPair(varAddress,NULL);
-//     return result;
-//   }
-//   switch(e->attr.op.operator){
-//     case PLUS:
-//       {
-//         instruction = mKInstr(ADD,mkAddrVar(t),p1->address,p2->address);
-//         printf("PLUS\n");
-//         break;
-//       }
-//       case SUB:
-//         {
-//           instruction = mKInstr(SUB,mkAddrVar(t),p1->address,p2->address);
-//           printf("SUB\n");
-//           break;
-//         }
-//     case MUL:
-//         {
-//           instruction = mKInstr(MUL,mkAddrVar(t),p1->address,p2->address);
-//           printf("MUL\n");
-//           break;
-//         }
-//     case DIV:
-//         {
-//           instruction = mKInstr(DIV,mkAddrVar(t),p1->address,p2->address);
-//           printf("DIV\n");
-//           break;
-//         }
-//   }
-//   append(list,mkList(instruction,NULL));
-//   return NULL;
-  //char * newvar = newVar();
-  //return mkPair(mkAddrVar(newvar),append(list,mkList(instruction,NULL)));
-  // switch(e->attr.op.operator){
-  //   case PLUS: 
-  //       {
-  //         instruction = mKInstr(ADD,mkAddrVar(t),p1->address,p2->address);
-  //         break;
-  //       }
-  //   case SUB:
-  //       {
-  //         instruction = mKInstr(SUB,mkAddrVar(t),p1->address,p2->address);
-  //         break;
-  //       }
-  //   case MUL:
-  //       {
-  //         instruction = mKInstr(MUL,mkAddrVar(t),p1->address,p2->address);
-  //         break;
-  //       }
-  //   case DIV:
-  //       {
-  //         instruction = mKInstr(DIV,mkAddrVar(t),p1->address,p2->address);
-  //         break;
-  //       }
-  // }
-  // return mkPair(mkAddrVar(newVar()),append(list,mkList(instruction,NULL)));
-  //return NULL;
-//}
-
-
-
-InstrList* compileCmd(Cmd *cmd){
-  return NULL;
 }

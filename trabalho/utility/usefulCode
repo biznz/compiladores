@@ -1,0 +1,38 @@
+{DIGIT}+"."{DIGIT}+ 	{
+						printf("A float %s (%d)\n",yytext,atof(yytext));
+						yylval.doubleValue = atof(yytext);
+						return DOUBLE;
+						}
+
+
+/*IF_TEST "if"
+ELSE_TEST "else"
+FOR_CICLE "for"*/
+
+/*{IF_TEST} {
+	printf("an if test %s\n",yytext);
+	yyerror("IF");}
+{ELSE_TEST} {
+	printf("an else test %s\n",yytext);
+	yyerror("ELSE");}
+{FOR_CICLE} {
+	printf("a for cicle %s\n",yytext);
+	yyerror("FOR");}
+*/
+
+{TAB}* 		{
+			printf("a newLine %s, ",yytext);
+			yytabs++;
+			}
+
+
+{ID} 		{
+			printf("a variable %s, ",yytext);
+			}
+
+
+			FINISH <<EOF>>
+
+			{FINISH}	{
+			yyterminate();
+			}

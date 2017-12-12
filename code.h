@@ -55,12 +55,19 @@ struct _Address* address;
 struct _InstrList* list;
 };
 
+struct _PairList
+{
+  struct _Pair* pair;
+  struct _PairList* next;
+};
+
 typedef enum _Opkind Opkind;
 typedef enum _AddrKind AddrKind;
 typedef struct _Address Address;
 typedef struct _Pair Pair;
 typedef struct _Instr Instr;
 typedef struct _InstrList InstrList;
+typedef struct _PairList PairList;
 // compileExpr(2*3)
 // compileExpr(2) retorna pair(2,null)
 // compileExpr(3) retorna pair(3,null)
@@ -73,7 +80,11 @@ Pair* mkPair(Address* c, InstrList* l);
 void printInstr(Instr* instr);
 void printInstrList(InstrList* list);
 InstrList* append(InstrList* l1, InstrList* l2);
-InstrList* compile_Cmd (Cmd* c);
+//InstrList* compile_Cmd (Cmd* c);
+PairList * appendPair(PairList* l1,PairList* l2);
+PairList* mkPairList(Pair* pair,PairList* pairList);
+Pair* compileCmd(Cmd* cmd);
 Pair* compileExpr(Expr* e);
+void printOpKind(Instr* instr);
 
 #endif

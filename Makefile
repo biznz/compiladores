@@ -23,7 +23,4 @@ clean:
 	rm -f $(PROGRAM) $(OBJS) $(INTERM)
 
 test: $(PROGRAM)
-	$(PROGRAM) tests/testesTrabalho/exampleExprFunc.txt
-	
-
-
+	$(PROGRAM) tests/testesTrabalho/exampleFunc.txt
