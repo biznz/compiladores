@@ -11,14 +11,10 @@ InstrList* globalList;
 void evalCmdList3(CmdList* cmdList,int spacing){
   PairList* list = compileCmdList(cmdList);
   printPairList(list);
-  printf("-----||||||||||||||||----\n");
-  //evalCmdList3_address(cmdList,spacing);
-
 }
 
 void evalCmdList3_address(CmdList* cmdList,int spacing){ //compileCmdList
    evalCmd3_address(cmdList->block.command,spacing);
-   //globalList = append(globalList,evalCmdr_address);
    if(cmdList->block.previous!=0){
       printf("---------\n");
       evalCmdList3_address(cmdList->block.previous,spacing);
@@ -27,8 +23,6 @@ void evalCmdList3_address(CmdList* cmdList,int spacing){ //compileCmdList
 
 void evalCmd3_address(Cmd* cmd, int spacing){ //compileCmd
   Pair* result = compileCmd(cmd);
-  //printPair(result);
-  printInstrList(result->list);
 }
 
 int main(int argc, char** argv) {
@@ -46,8 +40,6 @@ int main(int argc, char** argv) {
   do{
     if(yyparse()==0){
       int spacing = 0;
-      //printf("func main()\n");
-      //evalCmdList(cmdList,spacing);
       printf("\n");
       evalCmdList3(cmdList,spacing);
       //evalCmdList3_address(cmdList,spacing);

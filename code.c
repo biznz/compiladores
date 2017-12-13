@@ -199,7 +199,7 @@ void printInstr(Instr* instr){
     return;
   }
   if(comparison(instr) == 1){
-    printf(" %s: \n",instr->addr3->content.variable);
+    //printf(" %s: \n",instr->addr3->content.variable);
     printf(" if ");
     if(instr->addr1->kind == INTEGER){
       //print
@@ -383,27 +383,19 @@ Pair* compileCmd(Cmd *cmd){
     InstrList* t1List = mkList(t1,NULL);
     t1List = append(the_var->list,t1List);
     Pair* t1Pair = mkPair(addr1,t1List);
+    //printInstrList(t1List);
 
     InstrList* t2List = mkList(t2,NULL);
-    t1List = append(pair->list,t2List);
+    t1List = append(t1List,t2List);
     Pair* t2Pair = mkPair(addr2,t1List);
-
-
-    //printPair(t1Pair);
-    //printPair(t2Pair);
-
-    //printPair(the_var);
-    //printPair(pair);
-    //printf("\n");
 
     Instr* varInstr = mKInstr(ATRIBUTION,the_var->address,pair->address,NULL);
     InstrList* list = mkList(varInstr,NULL);
+    //InstrList* list = mkList(varInstr,condition);
     list = append(pair->list,list);
     Pair* new_pair = mkPair(the_var->address,list);
-    //printPair(new_pair);
 
-
-    char* label1 = newLabel();
+    char* label1 = newLabel(); //Lx label
     Address* labelAddress = mkAddrVar(label1);
     //printf("if ");
     Instr* instr = mKInstr(convertOp(cmd->attr.ifcmd.condition->attr.op.operator),t1Pair->address,t2Pair->address,labelAddress);
@@ -414,7 +406,10 @@ Pair* compileCmd(Cmd *cmd){
     
     //Instr* gotoI = mKInstr()
     InstrList* result = mkList(instr,list1);
-    Pair* ifPair = mkPair(labelAddress,result);
+    t1List = append(t1List,result);
+    //printInstrList(t1List);
+    Pair* ifPair = mkPair(labelAddress,t1List);
+    //Pair* ifPair = mkPair(labelAddress,result);
     //printf("returns the if pair\n");
     return ifPair;
     //printInstrList(result);
