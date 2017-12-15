@@ -9,16 +9,10 @@ InstrList* globalList;
 
 
 void evalCmdList3(CmdList* cmdList,int spacing){
-  PairList* list = compileCmdList(cmdList);
+  PairList* newList = (PairList*) malloc(sizeof(PairList));
+  newList = mkPairList(NULL,NULL);
+  PairList* list = compileCmdList(cmdList,newList);
   printPairList(list);
-}
-
-void evalCmdList3_address(CmdList* cmdList,int spacing){ //compileCmdList
-   evalCmd3_address(cmdList->block.command,spacing);
-   if(cmdList->block.previous!=0){
-      printf("---------\n");
-      evalCmdList3_address(cmdList->block.previous,spacing);
-   }
 }
 
 void evalCmd3_address(Cmd* cmd, int spacing){ //compileCmd

@@ -148,14 +148,6 @@ expr    :
         expr AND expr{
           $$ = ast_operation(AND, $1, $3);
         }
-        |
-        VAR INC { 
-          $$ = ast_post(PLUS,$1, 1);
-        }
-        |
-        VAR DEC {
-          $$ = ast_post(MINUS,$1, 1);
-        }
         ;
 
 bexpr   :
@@ -210,6 +202,14 @@ cmd     :
         |
         SPRINT LPAREN VAR RPAREN ENDLINE
           {$$ = ast_sprint($3);}
+        |
+        VAR INC ENDLINE{ 
+          $$ = ast_post(PLUS,$1, 1);
+        }
+        |
+        VAR DEC ENDLINE{
+          $$ = ast_post(MINUS,$1, 1);
+        }
         | 
         VAR ATTRIB expr ENDLINE { $$ = ast_attrib($1, $3);}
         | 
@@ -222,8 +222,8 @@ cmd     :
         FOR bexpr LBRACE cmdList RBRACE 
           { $$ = ast_for($2,$4);}
         | 
-        FOR cmd ENDLINE bexpr ENDLINE expr LBRACE cmdList RBRACE
-          { $$ = ast_forclause($2,$4,$6,$8);}
+        FOR cmd bexpr ENDLINE cmd LBRACE cmdList RBRACE
+          { $$ = ast_forclause($2,$3,$5,$7);}
         ;
 
 

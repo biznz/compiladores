@@ -78,7 +78,7 @@ struct _Cmd{
       struct{
         struct _Cmd* initStmt;
         struct _BExpr* condition;
-        struct _Expr* postStmt;
+        struct _Cmd* postStmt;
         struct _CmdList* cmdList;
       }forclause;
       struct{

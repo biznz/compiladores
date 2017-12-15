@@ -88,21 +88,11 @@ Cmd* ast_post(int operator,char* var,int i){
   Expr* expr = (Expr*) malloc(sizeof(Expr));
   Expr* operand1 = (Expr*) malloc(sizeof(Expr));
   Expr* operand2 = (Expr*) malloc(sizeof(Expr));
-  
-  operand1->kind = E_VAR;
-  operand1->attr.var = strdup(var);
-  operand2->kind = E_INTEGER;
-  operand2->attr.value = i;
-  
-  //expr->kind = E_OPERATION;
-  // expr->attr.op.operator = operator;
-  // expr->attr.op.left = operand1;
-  // expr->attr.op.right = operand2;
-  // node->attr.attrib.value = ast_operation(operator,)
-  node->kind = E_ATTRIB;
-  //node->
-  //node->attr.attrib.variable = strdup(var->attr.var);
-  //printf("%s = %d %d %i\n",strdup(var->attr.var),var->attr.value,operator,i);
+  operand1 = ast_var(var);
+  operand2 = ast_integer(i);
+  expr = ast_operation(operator,operand1,operand2);
+  //printExpr(expr);
+  node = ast_attrib(var,expr);
   return node;
 }
 
